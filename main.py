@@ -18,8 +18,9 @@ def draw_modes():
 
 
 def calc(model):
-    x = np.array(input('Enter two values separated by space: ').split(), dtype=np.float32)
-    print('Output: {}  (Correct: {})'.format(model(x), a+b))
+    a = np.array(input('Enter two values separated by space: ').split(), dtype=np.float32).reshape(1, 2)
+    x = chainer.Variable(a)
+    print('Output: {}  (Correct: {})'.format(model(x), a.sum()))
 
 
 def main():
@@ -46,12 +47,12 @@ def main():
             digit = input('Enter the number of learning digit: ')
 
             for _ in range(epoch):
+                a = np.random.rand(2).reshape(1, 2).astype(np.float32) * eval('1e+' + digit)
+                x = chainer.Variable(a)
+                x = model(x)
+                t = chainer.Variable(a.sum().reshape(1, 1))
+
                 model.zerograds()
-
-                a, b = np.random.rand(2) * eval('1e+' + digit)
-                x = model(a, b)
-                t = a + b
-
                 loss = F.squared_error(x, t)
                 loss.backward()
                 optimizer.update()
